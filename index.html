@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Invitation | Luxurious Emerald</title>
+    <title>Wedding Invitation | Honored Guest</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
@@ -15,9 +15,8 @@
         body {
             background: #000;
             background-image: url('final_bg.png');
-            background-size: contain;
+            background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
             background-attachment: fixed;
             font-family: 'Montserrat', sans-serif;
             min-height: 100vh;
@@ -25,15 +24,14 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            perspective: 1000px;
         }
 
-        /* Cinematic Darkening */
+        /* Dark overlay for focus */
         body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+            background: rgba(0,0,0,0.4);
             z-index: -1;
         }
 
@@ -44,54 +42,46 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 1.2s ease, transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: opacity 0.8s ease, transform 0.8s ease;
             z-index: 10;
             width: 100%;
-            height: 100%;
-            transform: scale(0.85); /* Starting far back for push-in */
-        }
-        #stage.push-in {
-            transform: scale(1.1) translateY(-20px);
         }
         #stage.fade-back {
-            opacity: 0.05;
-            transform: scale(0.7) translateZ(-500px);
+            opacity: 0.1;
+            transform: scale(0.85) translateY(20px);
             pointer-events: none;
         }
 
         .envelope-wrapper {
             position: relative;
-            width: 85vmin;
-            height: 120vmin;
-            max-width: 320px;
-            max-height: 450px;
+            width: 75vw; /* Reduced from 80vw */
+            height: 105vw; /* Reduced from 110vw */
+            max-width: 340px; /* Reduced from 380px */
+            max-height: 480px; /* Reduced from 520px */
             cursor: pointer;
-            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
-        }
-        .envelope-wrapper.lifted {
-            transform: translateY(-40px) rotateX(15deg) rotateY(-5deg);
         }
 
-        /* Glowing Wax Seal Effect */
+        /* Responsive scaling for very small screens */
+        @media (max-width: 360px) {
+            .envelope-wrapper {
+                transform: scale(0.9);
+            }
+        }
+
+        /* Transparent click zone for the central seal area */
         .wax-seal {
             position: absolute;
             top: 55%; 
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             z-index: 30;
             background: transparent;
-            box-shadow: 0 0 0px rgba(200, 168, 75, 0);
-            transition: box-shadow 1s ease-in-out;
-        }
-        .wax-seal.glow {
-            box-shadow: 0 0 30px rgba(200, 168, 75, 0.4);
         }
 
-        /* The Cinematic Flap */
+        /* Animated flap overlay */
         .flap {
             position: absolute;
             top: 26%;
@@ -103,32 +93,13 @@
             z-index: 10;
             opacity: 0;
             transform-origin: top;
-            transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
-            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.5);
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
         }
         .envelope-wrapper.opened .flap {
             opacity: 1;
         }
         .flap.open {
-            transform: rotateX(-175deg);
-        }
-
-        /* Golden Beam from inside */
-        .light-beam {
-            position: absolute;
-            top: 30%; left: 50%;
-            transform: translateX(-50%);
-            width: 80%; height: 0;
-            background: linear-gradient(0deg, rgba(200,168,75,0) 0%, rgba(200,168,75,0.4) 100%);
-            filter: blur(20px);
-            z-index: 5;
-            transition: height 1s ease 0.5s, opacity 1s ease;
-            opacity: 0;
-            pointer-events: none;
-        }
-        .envelope-wrapper.opened .light-beam {
-            height: 150%;
-            opacity: 1;
+            transform: perspective(1000px) rotateX(-170deg);
         }
 
         /* CARD OVERLAY */
@@ -141,9 +112,10 @@
             z-index: 200;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 1.5s ease;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(15px);
+            transition: opacity 0.8s ease;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            padding: 10px;
         }
         #cardOverlay.visible {
             opacity: 1;
@@ -152,17 +124,16 @@
 
         .card {
             background: #ffffff;
-            width: 90vmin;
-            max-width: 380px;
-            max-height: 85vh;
+            width: 420px;
+            max-width: 100%;
+            max-height: 85vh; /* Leave more breathing room */
             border-radius: 4px;
-            box-shadow: 0 80px 200px rgba(0,0,0,1);
+            box-shadow: 0 50px 120px rgba(0,0,0,0.9);
             border: 1px solid rgba(4, 57, 39, 0.1);
             position: relative;
-            transform: scale(0.7) translateY(120px);
-            transition: transform 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.8) translateY(40px);
+            transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
             overflow: hidden;
-            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
         }
         #cardOverlay.visible .card {
             transform: scale(1) translateY(0);
@@ -170,14 +141,14 @@
 
         .card-body {
             position: absolute;
-            inset: 15px;
+            inset: 12px;
             border: 1px solid rgba(4, 57, 39, 0.08);
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 50px 20px;
+            padding: 30px 15px;
             overflow-y: auto;
         }
         .card::after {
@@ -186,69 +157,66 @@
             padding-top: 140%;
         }
 
-        .card-script { font-family: 'Alex Brush', cursive; color: #043927; font-size: 3.8rem; line-height: 1; margin-bottom: 25px; opacity: 0; transform: translateY(20px); transition: 1s ease 0.8s; }
-        .card-text   { font-size: 10px; letter-spacing: 0.18em; color: #444; line-height: 2; font-weight: 500; text-transform: uppercase; margin-bottom: 40px; max-width: 250px; opacity: 0; transform: translateY(20px); transition: 1s ease 1.2s; }
-        .line-divider { width: 45px; height: 1.5px; background: #C8A84B; margin-bottom: 40px; opacity: 0; transition: 1s ease 1.5s; }
+        /* Content theme: Emerald & Gold */
+        .card-script { font-family: 'Alex Brush', cursive; color: #043927; font-size: 3.8rem; line-height: 1; margin-bottom: 15px; }
+        .card-text { font-size: 9px; letter-spacing: 0.12em; color: #444; line-height: 1.6; font-weight: 500; text-transform: uppercase; margin-bottom: 30px; max-width: 240px; }
+        .line-divider { width: 35px; height: 1.5px; background: #C8A84B; margin-bottom: 30px; }
         
-        .badge-label { font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: #999; margin-bottom: 15px; opacity: 0; transition: 1s ease 1.8s; }
-        .seat-badge  { 
+        .badge-label { font-size: 7px; letter-spacing: 0.2em; text-transform: uppercase; color: #999; margin-bottom: 10px; }
+        .seat-badge { 
             font-family: 'Playfair Display', serif; 
-            font-size: 1.8rem; 
+            font-size: 1.5rem; 
             font-weight: 700; 
             color: #C8A84B; 
             letter-spacing: 0.05em; 
             background: #043927;
-            padding: 16px 35px;
+            padding: 12px 24px;
             border-radius: 4px;
-            box-shadow: 0 20px 50px rgba(4, 57, 39, 0.4);
-            opacity: 0; transform: translateY(20px); transition: 1s ease 2s;
         }
 
-        #cardOverlay.visible .card-script, 
-        #cardOverlay.visible .card-text, 
-        #cardOverlay.visible .line-divider, 
-        #cardOverlay.visible .badge-label, 
-        #cardOverlay.visible .seat-badge {
-            opacity: 1; transform: translateY(0);
+        @media (max-width: 480px) {
+            .card-script { font-size: 2.8rem; }
+            .card-text { font-size: 8px; line-height: 1.5; }
+            .seat-badge { font-size: 1.3rem; padding: 10px 20px; }
+            .card-body { padding: 20px 10px; }
         }
 
-        .bokeh-particle {
-            position: fixed;
-            border-radius: 50%;
-            background: rgba(200, 168, 75, 0.3);
-            pointer-events: none;
-            z-index: 100;
-        }
+        .footer-text { font-size: 6px; letter-spacing: .4em; text-transform: uppercase; color: #ccc; margin-top: auto; padding-top: 15px; }
+
+        .card-close { position: absolute; top: 10px; right: 10px; font-size: 16px; color: #ccc; cursor: pointer; z-index: 50; }
 
         .tap-hint {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            font-size: 9px; letter-spacing: 0.6em; text-transform: uppercase;
-            color: #fff; opacity: 0.8; pointer-events: none;
-            animation: ph 2.5s infinite;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            font-size: 8px; letter-spacing: 0.4em; text-transform: uppercase;
+            color: #fff; opacity: 0.7; pointer-events: none;
             z-index: 20;
         }
-        @keyframes ph { 0%,100%{opacity:0.2; transform: translateX(-50%) translateY(0);} 50%{opacity:1; transform: translateX(-50%) translateY(-5px);} }
+        @keyframes ph { 0%,100%{opacity:0.3} 50%{opacity:1} }
     </style>
 </head>
 <body>
 
 <div id="cardOverlay">
     <div class="card">
+        <div class="card-close" onclick="closeCard()">✕</div>
         <div class="card-body">
             <h1 class="card-script">Welcome</h1>
             <p class="card-text">We're honored to have you celebrate this special day with us.</p>
+            
             <div class="line-divider"></div>
+            
             <p class="badge-label">Your Assigned Seat</p>
             <div class="seat-badge">
                 Table <span id="tableNo">TBA</span>, Seat <span id="seatNo">TBA</span>
             </div>
+
+            <p class="footer-text">Wedding Celebration &nbsp;•&nbsp; 2026</p>
         </div>
     </div>
 </div>
 
 <div id="stage">
     <div class="envelope-wrapper" id="envelopeWrapper" onclick="openInvitation()">
-        <div class="light-beam"></div>
         <div class="flap" id="flap"></div>
         <div class="wax-seal" id="waxSeal"></div>
     </div>
@@ -258,74 +226,53 @@
 
 <script>
     const params = new URLSearchParams(window.location.search);
-    document.getElementById('tableNo').innerText = params.get('table') || 'TBA';
-    document.getElementById('seatNo').innerText  = params.get('seat')  || 'TBA';
+    let table = params.get('table') || '';
+    let seat = params.get('seat') || '';
+    const sid = params.get('sid');
 
-    /* Create Floating Cinematic Particles */
-    function createParticles() {
-        for(let i=0; i<30; i++) {
-            const p = document.createElement('div');
-            p.className = 'bokeh-particle';
-            const size = Math.random() * 10 + 5;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.top = Math.random() * 100 + 'vh';
-            document.body.appendChild(p);
-            
-            gsap.to(p, {
-                x: (Math.random() - 0.5) * 200,
-                y: (Math.random() - 0.5) * 200,
-                opacity: Math.random() * 0.5 + 0.1,
-                duration: Math.random() * 10 + 5,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
+    if (sid && !table && !seat) {
+        const idNum = parseInt(sid);
+        if (!isNaN(idNum) && idNum > 0) {
+            table = Math.ceil(idNum / 10);
+            seat  = ((idNum - 1) % 10) + 1;
         }
     }
-    createParticles();
+
+    document.getElementById('tableNo').innerText = table || 'TBA';
+    document.getElementById('seatNo').innerText  = seat  || 'TBA';
 
     let isOpen = false;
     function openInvitation() {
         if (isOpen) return;
         isOpen = true;
         
-        const stage   = document.getElementById('stage');
         const wrapper = document.getElementById('envelopeWrapper');
         const flap    = document.getElementById('flap');
         const seal    = document.getElementById('waxSeal');
+        const stage   = document.getElementById('stage');
         const overlay = document.getElementById('cardOverlay');
         const hint    = document.getElementById('tapHint');
 
-        /* 1. Camera Pushes In & Wax Seal Glows */
-        stage.classList.add('push-in');
-        seal.classList.add('glow');
-        gsap.to(hint, { opacity: 0, duration: 0.5 });
+        wrapper.classList.add('opened');
+        flap.classList.add('open');
+        gsap.to(hint, { opacity: 0, duration: 0.3 });
 
-        /* 2. Envelope Lifts & Tilts */
-        setTimeout(() => wrapper.classList.add('lifted'), 600);
+        setTimeout(() => stage.classList.add('fade-back'), 800);
+        setTimeout(() => overlay.classList.add('visible'), 1100);
 
-        /* 3. Flap Opens Gracefully */
-        setTimeout(() => {
-            wrapper.classList.add('opened');
-            flap.classList.add('open');
-        }, 1500);
-
-        /* 4. Cinematic Fade & Card Float Up */
-        setTimeout(() => stage.classList.add('fade-back'), 3000);
-        setTimeout(() => overlay.classList.add('visible'), 3400);
-
-        /* 5. Golden Shimmer Confetti */
         setTimeout(() => {
             confetti({
-                particleCount: 200,
-                spread: 90,
-                origin: { y: 0.7 },
-                colors: ['#C8A84B', '#ffffff', '#043927'],
-                ticks: 300
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#043927', '#C8A84B', '#ffffff']
             });
-        }, 3600);
+        }, 1300);
+    }
+
+    function closeCard() {
+        document.getElementById('cardOverlay').classList.remove('visible');
+        setTimeout(() => document.getElementById('stage').classList.remove('fade-back'), 400);
     }
 </script>
 </body>
