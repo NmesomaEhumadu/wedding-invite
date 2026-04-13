@@ -14,7 +14,7 @@
 
         body {
             background: #000;
-            background-image: url('emerald_floral_envelope_1776106539058.png');
+            background-image: url('final_emerald_floral_envelope_1776107004400.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -26,17 +26,17 @@
             overflow: hidden;
         }
 
-        /* Subtle dark overlay to ensure text/envelope readability */
+        /* Dark overlay for focus */
         body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             z-index: -1;
         }
 
         /* =============================================
-           STAGE — envelope lives here, centered
+           INTERACTION STAGE
            ============================================= */
         #stage {
             display: flex;
@@ -46,78 +46,52 @@
             z-index: 10;
         }
         #stage.fade-back {
-            opacity: 0.25;
-            transform: scale(0.88) translateY(30px);
+            opacity: 0.1;
+            transform: scale(0.9) translateY(20px);
             pointer-events: none;
         }
 
-        /* =============================================
-           ENVELOPE WRAPPER
-           ============================================= */
         .envelope-wrapper {
             position: relative;
-            width: 90vw;
-            height: 62.5vw;
-            max-width: 500px;
-            max-height: 350px;
+            width: 80vw;
+            height: 110vw;
+            max-width: 380px;
+            max-height: 520px;
             cursor: pointer;
-            transition: transform 0.3s ease;
-            background: rgba(4, 57, 39, 0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 4px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-        }
-        .envelope-wrapper:hover:not(.opened) {
-            transform: translateY(-4px);
         }
 
-        /* ── FLAP ── */
-        .flap {
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 100%;
-            z-index: 10;
-            transform-origin: top center;
-            transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #043927;
-            clip-path: polygon(0% 0%, 100% 0%, 50% 50%);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .flap.open {
-            transform: perspective(1600px) rotateX(-160deg);
-        }
-
-        /* ── WAX SEAL ── */
+        /* Transparent click zone for the central seal area */
         .wax-seal {
             position: absolute;
-            bottom: 35%;
+            top: 55%; 
             left: 50%;
-            transform: translateX(-50%);
-            width: 12vw; height: 12vw;
-            max-width: 70px; max-height: 70px;
-            min-width: 50px; min-height: 50px;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background: #ffffff;
-            border: 1.5px solid rgba(4, 57, 39, 0.2);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-            z-index: 20;
-            transition: transform 0.6s ease, opacity 0.5s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Playfair Display', serif;
-            font-weight: bold;
-            color: #043927;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
+            z-index: 30;
+            background: transparent;
         }
-        .wax-seal::after {
-            content: 'T&A';
-            opacity: 0.8;
-        }
-        .wax-seal.gone {
-            transform: translateX(-50%) scale(0);
+
+        /* Animated flap overlay */
+        .flap {
+            position: absolute;
+            top: 26%;
+            left: 5%;
+            width: 90%;
+            height: 35%;
+            background: #043927;
+            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+            z-index: 10;
             opacity: 0;
+            transform-origin: top;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+        }
+        .envelope-wrapper.opened .flap {
+            opacity: 1;
+        }
+        .flap.open {
+            transform: perspective(1000px) rotateX(-170deg);
         }
 
         /* CARD OVERLAY */
@@ -130,8 +104,9 @@
             z-index: 200;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.7s ease;
-            background: rgba(0,0,0,0.8);
+            transition: opacity 0.8s ease;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
             padding: 20px;
         }
         #cardOverlay.visible {
@@ -145,11 +120,11 @@
             max-width: 100%;
             max-height: 90vh;
             border-radius: 4px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-            border: 1px solid rgba(4, 57, 39, 0.2);
+            box-shadow: 0 50px 120px rgba(0,0,0,0.9);
+            border: 1px solid rgba(4, 57, 39, 0.1);
             position: relative;
-            transform: scale(0.9) translateY(40px);
-            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+            transform: scale(0.85) translateY(50px);
+            transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
             overflow: hidden;
         }
         #cardOverlay.visible .card {
@@ -158,8 +133,8 @@
 
         .card-body {
             position: absolute;
-            inset: 12px;
-            border: 1px solid rgba(4, 57, 39, 0.2);
+            inset: 15px;
+            border: 1px solid rgba(4, 57, 39, 0.1);
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -174,50 +149,42 @@
             padding-top: 140%;
         }
 
-        /* Card text from customer reference */
-        .card-script { font-family: 'Alex Brush', cursive; color: #C8A84B; font-size: 4.5rem; line-height: 1; margin-bottom: 25px; }
-        .card-text { font-size: 10px; letter-spacing: 0.15em; color: #444; line-height: 1.8; font-weight: 500; font-family: 'Montserrat', sans-serif; max-width: 280px; text-transform: uppercase; margin-bottom: 30px; }
-        .line-divider { width: 50px; height: 2px; background: #C8A84B; margin-bottom: 30px; }
-        .badge-label { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 10px; }
-        .seat-badge { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #C8A84B; letter-spacing: 0.05em; margin-bottom: 25px; }
+        /* Content theme: Emerald & Gold */
+        .card-script { font-family: 'Alex Brush', cursive; color: #043927; font-size: 4.5rem; line-height: 1; margin-bottom: 20px; }
+        .card-text { font-size: 10px; letter-spacing: 0.15em; color: #444; line-height: 1.8; font-weight: 500; text-transform: uppercase; margin-bottom: 35px; max-width: 260px; }
+        .line-divider { width: 45px; height: 1.5px; background: #C8A84B; margin-bottom: 35px; }
+        
+        .badge-label { font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: #999; margin-bottom: 12px; }
+        .seat-badge { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            color: #C8A84B; 
+            letter-spacing: 0.05em; 
+            background: #043927;
+            padding: 15px 30px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(4, 57, 39, 0.3);
+        }
 
         @media (max-width: 480px) {
-            .card-script { font-size: 3.5rem; }
+            .card-script { font-size: 3.2rem; }
             .card-text { font-size: 9px; line-height: 1.6; }
-            .seat-badge { font-size: 1.4rem; }
+            .seat-badge { font-size: 1.5rem; padding: 12px 24px; }
             .card-body { padding: 30px 15px; }
         }
 
-        .footer-text { font-size: 8px; letter-spacing: .46em; text-transform: uppercase; color: #bbb; margin-top: auto; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px; width: 100%; }
-
-        /* Close button */
-        .card-close {
-            position: absolute;
-            top: 10px; right: 10px;
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.05);
-            color: #666;
-            font-size: 14px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-            z-index: 100;
-        }
+        .footer-text { font-size: 7px; letter-spacing: .46em; text-transform: uppercase; color: #bbb; margin-top: auto; padding-top: 20px; }
+        .card-close { position: absolute; top: 12px; right: 12px; font-size: 18px; color: #ccc; cursor: pointer; z-index: 10; }
 
         .tap-hint {
-            position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
-            font-size: 9px; letter-spacing: .44em; text-transform: uppercase;
-            color: #ddd; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px;
-            pointer-events: none;
-            animation: ph 2.2s ease-in-out infinite;
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            font-size: 8px; letter-spacing: 0.5em; text-transform: uppercase;
+            color: #fff; opacity: 0.8; pointer-events: none;
+            animation: ph 2s infinite;
             z-index: 20;
         }
-        @keyframes ph { 0%,100%{opacity:.4} 50%{opacity:1} }
-
-        .sparkle {
-            position: fixed; border-radius: 50%;
-            background: #ffffff; pointer-events: none; z-index: 300; opacity: 0;
-        }
+        @keyframes ph { 0%,100%{opacity:0.3} 50%{opacity:1} }
     </style>
 </head>
 <body>
@@ -226,17 +193,14 @@
     <div class="card">
         <div class="card-close" onclick="closeCard()">✕</div>
         <div class="card-body">
-            <h2 class="card-script">Welcome</h2>
-            
+            <h1 class="card-script">Welcome</h1>
             <p class="card-text">We're honored to have you celebrate this special day with us.</p>
             
             <div class="line-divider"></div>
             
-            <div class="seating-area">
-                <p class="badge-label">Your Assigned Seat</p>
-                <div class="seat-badge">
-                    Table <span id="tableNo">TBA</span>, Seat <span id="seatNo">TBA</span>
-                </div>
+            <p class="badge-label">Your Assigned Seat</p>
+            <div class="seat-badge">
+                Table <span id="tableNo">TBA</span>, Seat <span id="seatNo">TBA</span>
             </div>
 
             <p class="footer-text">Wedding Celebration &nbsp;•&nbsp; 2026</p>
@@ -245,22 +209,20 @@
 </div>
 
 <div id="stage">
-<div class="envelope-wrapper" id="envelopeWrapper" onclick="openInvitation()">
-    <div class="flap" id="flap"></div>
-    <div class="wax-seal" id="waxSeal"></div>
-</div>
+    <div class="envelope-wrapper" id="envelopeWrapper" onclick="openInvitation()">
+        <div class="flap" id="flap"></div>
+        <div class="wax-seal" id="waxSeal"></div>
+    </div>
 </div>
 
 <div class="tap-hint" id="tapHint">Tap to Open</div>
 
 <script>
-    /* URL personalisation */
     const params = new URLSearchParams(window.location.search);
-    let table  = params.get('table') || '';
-    let seat   = params.get('seat')  || '';
-    const sid  = params.get('sid'); // Sequential ID (1-260)
+    let table = params.get('table') || '';
+    let seat = params.get('seat') || '';
+    const sid = params.get('sid');
 
-    /* Automatic calculation if sid is provided */
     if (sid && !table && !seat) {
         const idNum = parseInt(sid);
         if (!isNaN(idNum) && idNum > 0) {
@@ -269,68 +231,41 @@
         }
     }
 
-    /* Fallbacks */
-    if (!table) table = 'TBA';
-    if (!seat)  seat  = 'TBA';
-
-    document.getElementById('tableNo').innerText = table;
-    document.getElementById('seatNo').innerText  = seat;
+    document.getElementById('tableNo').innerText = table || 'TBA';
+    document.getElementById('seatNo').innerText  = seat  || 'TBA';
 
     let isOpen = false;
-
     function openInvitation() {
         if (isOpen) return;
         isOpen = true;
-        document.getElementById('envelopeWrapper').classList.add('opened');
-
+        
+        const wrapper = document.getElementById('envelopeWrapper');
         const flap    = document.getElementById('flap');
         const seal    = document.getElementById('waxSeal');
         const stage   = document.getElementById('stage');
         const overlay = document.getElementById('cardOverlay');
         const hint    = document.getElementById('tapHint');
 
-        /* 1. Seal disappears */
-        seal.classList.add('gone');
+        wrapper.classList.add('opened');
+        flap.classList.add('open');
+        gsap.to(hint, { opacity: 0, duration: 0.3 });
 
-        /* 2. Flap opens (slight delay for better drama) */
-        setTimeout(() => flap.classList.add('open'), 150);
-
-        /* 3. Hint fades */
-        gsap.to(hint, { opacity: 0, y: 8, duration: 0.4 });
-
-        /* 4. Envelope fades back */
         setTimeout(() => stage.classList.add('fade-back'), 800);
+        setTimeout(() => overlay.classList.add('visible'), 1100);
 
-        /* 5. Card overlay appears centered */
-        setTimeout(() => overlay.classList.add('visible'), 1000);
-
-        /* 6. Confetti */
         setTimeout(() => {
-            const cfg = { origin: { y: 0.55 }, colors: ['#043927','#ffffff','#022a1d','#d4d4d4'] };
-            const fire = (r, o) => confetti({ ...cfg, ...o, particleCount: Math.floor(140 * r) });
-            fire(0.25, { spread: 28, startVelocity: 55 });
-            fire(0.20, { spread: 65 });
-            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-            fire(0.10, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-            fire(0.10, { spread: 120, startVelocity: 45 });
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#043927', '#C8A84B', '#ffffff']
+            });
         }, 1300);
-
-        /* 7. Emerald sparkles */
-        for (let i = 0; i < 20; i++) {
-            const s = document.createElement('div');
-            s.className = 'sparkle';
-            document.body.appendChild(s);
-            const sz = Math.random() * 5 + 2;
-            gsap.set(s, { x: Math.random() * innerWidth, y: Math.random() * innerHeight, width: sz, height: sz, opacity: 0 });
-            gsap.to(s, { opacity: 0.7, duration: Math.random() * 1.2 + 0.5, repeat: -1, yoyo: true, delay: Math.random() * 2.5 });
-        }
     }
 
     function closeCard() {
-        const overlay = document.getElementById('cardOverlay');
-        const stage   = document.getElementById('stage');
-        overlay.classList.remove('visible');
-        setTimeout(() => stage.classList.remove('fade-back'), 400);
+        document.getElementById('cardOverlay').classList.remove('visible');
+        setTimeout(() => document.getElementById('stage').classList.remove('fade-back'), 400);
     }
 </script>
 </body>
