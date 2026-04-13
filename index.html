@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Invitation | A Cinematic Celebration</title>
+    <title>Wedding Invitation | Luxurious Emerald</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=Alex+Brush&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -24,282 +25,307 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            perspective: 1000px;
         }
 
-        /* Ambient dark overlay */
+        /* Cinematic Darkening */
         body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.4);
+            background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
             z-index: -1;
         }
 
+        /* =============================================
+           INTERACTION STAGE
+           ============================================= */
         #stage {
-            position: relative;
-            width: 100vmin;
-            height: 100vmin;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Extra tilt for the camera push-in feel */
-            transform: perspective(1200px);
+            transition: opacity 1.2s ease, transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            transform: scale(0.85); /* Starting far back for push-in */
+        }
+        #stage.push-in {
+            transform: scale(1.1) translateY(-20px);
+        }
+        #stage.fade-back {
+            opacity: 0.05;
+            transform: scale(0.7) translateZ(-500px);
+            pointer-events: none;
         }
 
-        /* =============================================
-           THE ENVELOPE (Interactable)
-           ============================================= */
-        .envelope-container {
+        .envelope-wrapper {
             position: relative;
             width: 85vmin;
             height: 120vmin;
             max-width: 320px;
             max-height: 450px;
             cursor: pointer;
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
         }
+        .envelope-wrapper.lifted {
+            transform: translateY(-40px) rotateX(15deg) rotateY(-5deg);
+        }
 
-        /* The Seal Glow Animation */
-        .seal-interact {
+        /* Glowing Wax Seal Effect */
+        .wax-seal {
             position: absolute;
             top: 55%; 
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            z-index: 100;
-            background: radial-gradient(circle, rgba(200,168,75,0.4) 0%, transparent 70%);
-            animation: sealGlow 2.5s infinite alternate;
+            z-index: 30;
+            background: transparent;
+            box-shadow: 0 0 0px rgba(200, 168, 75, 0);
+            transition: box-shadow 1s ease-in-out;
         }
-        @keyframes sealGlow { 
-            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.3; } 
-            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.7; } 
+        .wax-seal.glow {
+            box-shadow: 0 0 30px rgba(200, 168, 75, 0.4);
         }
 
-        /* THE FLAP: Aligned exactly to the reference envelope fold */
-        .the-flap {
+        /* The Cinematic Flap */
+        .flap {
             position: absolute;
-            top: 40.5%; /* Correct fold line in reference image */
-            left: 0.5%;
-            width: 99%;
-            height: 25.5%;
+            top: 26%;
+            left: 5%;
+            width: 90%;
+            height: 35%;
             background: #043927;
             clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-            z-index: 50;
-            transform-origin: top;
-            box-shadow: inset 0 -4px 8px rgba(0,0,0,0.3);
-            /* Match the texture of the bg a bit */
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
-        }
-
-        /* INTERNAL GLOW (revealed when flap opens) */
-        .internal-light {
-            position: absolute;
-            top: 40%;
-            left: 10%;
-            width: 80%;
-            height: 20%;
-            background: radial-gradient(ellipse, rgba(200,168,75,0.6) 0%, transparent 80%);
+            z-index: 10;
             opacity: 0;
-            z-index: 40;
+            transform-origin: top;
+            transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.5);
+        }
+        .envelope-wrapper.opened .flap {
+            opacity: 1;
+        }
+        .flap.open {
+            transform: rotateX(-175deg);
+        }
+
+        /* Golden Beam from inside */
+        .light-beam {
+            position: absolute;
+            top: 30%; left: 50%;
+            transform: translateX(-50%);
+            width: 80%; height: 0;
+            background: linear-gradient(0deg, rgba(200,168,75,0) 0%, rgba(200,168,75,0.4) 100%);
+            filter: blur(20px);
+            z-index: 5;
+            transition: height 1s ease 0.5s, opacity 1s ease;
+            opacity: 0;
             pointer-events: none;
         }
-
-        /* =============================================
-           THE INVITATION CARD (Initially hidden inside)
-           ============================================= */
-        .card-system {
-            position: absolute;
-            top: 40%; 
-            left: 10%;
-            width: 80%;
-            height: 70%;
-            z-index: 45; /* Below flap, above pocket bg */
-            pointer-events: none;
-            overflow: hidden; /* Makes it looks like it emerges from the pocket */
+        .envelope-wrapper.opened .light-beam {
+            height: 150%;
+            opacity: 1;
         }
 
-        .invitation-card {
-            position: absolute;
-            bottom: -100%; /* Deep inside the pocket */
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #fff;
-            border-radius: 4px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px 15px;
-            text-align: center;
-            border: 1px solid rgba(4, 57, 39, 0.1);
-        }
-
-        .card-content {
-            opacity: 0; /* Fades in later */
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .inv-script { font-family: 'Alex Brush', cursive; color: #043927; font-size: 2.8rem; margin-bottom: 15px; }
-        .inv-text { font-size: 8px; letter-spacing: 0.15em; color: #444; text-transform: uppercase; margin-bottom: 25px; line-height: 1.6; max-width: 180px; }
-        .divider   { width: 30px; height: 1.5px; background: #C8A84B; margin-bottom: 25px; }
-        .seat-badge { 
-            background: #043927; color: #C8A84B; padding: 10px 20px; border-radius: 3px; 
-            font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700;
-        }
-
-        /* =============================================
-           PARTICLES
-           ============================================= */
-        .particles-layer {
+        /* CARD OVERLAY */
+        #cardOverlay {
             position: fixed;
             inset: 0;
-            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
             pointer-events: none;
-        }
-        .particle {
-            position: absolute;
-            background: #C8A84B;
-            border-radius: 50%;
             opacity: 0;
+            transition: opacity 1.5s ease;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(15px);
+        }
+        #cardOverlay.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        /* Tap Hint */
-        .hint {
+        .card {
+            background: #ffffff;
+            width: 90vmin;
+            max-width: 380px;
+            max-height: 85vh;
+            border-radius: 4px;
+            box-shadow: 0 80px 200px rgba(0,0,0,1);
+            border: 1px solid rgba(4, 57, 39, 0.1);
+            position: relative;
+            transform: scale(0.7) translateY(120px);
+            transition: transform 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
+        }
+        #cardOverlay.visible .card {
+            transform: scale(1) translateY(0);
+        }
+
+        .card-body {
+            position: absolute;
+            inset: 15px;
+            border: 1px solid rgba(4, 57, 39, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+            overflow-y: auto;
+        }
+        .card::after {
+            content: '';
+            display: block;
+            padding-top: 140%;
+        }
+
+        .card-script { font-family: 'Alex Brush', cursive; color: #043927; font-size: 3.8rem; line-height: 1; margin-bottom: 25px; opacity: 0; transform: translateY(20px); transition: 1s ease 0.8s; }
+        .card-text   { font-size: 10px; letter-spacing: 0.18em; color: #444; line-height: 2; font-weight: 500; text-transform: uppercase; margin-bottom: 40px; max-width: 250px; opacity: 0; transform: translateY(20px); transition: 1s ease 1.2s; }
+        .line-divider { width: 45px; height: 1.5px; background: #C8A84B; margin-bottom: 40px; opacity: 0; transition: 1s ease 1.5s; }
+        
+        .badge-label { font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: #999; margin-bottom: 15px; opacity: 0; transition: 1s ease 1.8s; }
+        .seat-badge  { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            color: #C8A84B; 
+            letter-spacing: 0.05em; 
+            background: #043927;
+            padding: 16px 35px;
+            border-radius: 4px;
+            box-shadow: 0 20px 50px rgba(4, 57, 39, 0.4);
+            opacity: 0; transform: translateY(20px); transition: 1s ease 2s;
+        }
+
+        #cardOverlay.visible .card-script, 
+        #cardOverlay.visible .card-text, 
+        #cardOverlay.visible .line-divider, 
+        #cardOverlay.visible .badge-label, 
+        #cardOverlay.visible .seat-badge {
+            opacity: 1; transform: translateY(0);
+        }
+
+        .bokeh-particle {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(200, 168, 75, 0.3);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .tap-hint {
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            font-size: 8px; color: #fff; letter-spacing: 0.5em; text-transform: uppercase;
-            animation: hintPulse 2s infinite; z-index: 60;
+            font-size: 9px; letter-spacing: 0.6em; text-transform: uppercase;
+            color: #fff; opacity: 0.8; pointer-events: none;
+            animation: ph 2.5s infinite;
+            z-index: 20;
         }
-        @keyframes hintPulse { 0%,100%{opacity: 0.3} 50%{opacity: 1} }
-
-        /* Mobile specific font sizing */
-        @media (max-width: 480px) {
-            .inv-script { font-size: 2.2rem; }
-        }
-        /* Laptop scaling */
-        @media (min-width: 1024px) {
-            body { background-size: contain; }
-            #stage { transform: scale(0.8); }
-        }
+        @keyframes ph { 0%,100%{opacity:0.2; transform: translateX(-50%) translateY(0);} 50%{opacity:1; transform: translateX(-50%) translateY(-5px);} }
     </style>
 </head>
 <body>
 
-<div class="particles-layer" id="particles"></div>
-
-<div id="stage">
-    <div class="envelope-container" onclick="startCinematicReveal()">
-        <div class="seal-interact" id="sealGlow"></div>
-        <div class="the-flap" id="masterFlap"></div>
-        <div class="internal-light" id="innerLight"></div>
-        
-        <!-- The Card Sliding System -->
-        <div class="card-system" id="cardContainer">
-            <div class="invitation-card" id="theCard">
-                <div class="card-content" id="cardText">
-                    <h2 class="inv-script">Welcome</h2>
-                    <p class="inv-text">We're honored to have you celebrate this special day with us.</p>
-                    <div class="divider"></div>
-                    <div class="seat-badge">
-                        Table <span id="tableNo">..</span>, Seat <span id="seatNo">..</span>
-                    </div>
-                </div>
+<div id="cardOverlay">
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-script">Welcome</h1>
+            <p class="card-text">We're honored to have you celebrate this special day with us.</p>
+            <div class="line-divider"></div>
+            <p class="badge-label">Your Assigned Seat</p>
+            <div class="seat-badge">
+                Table <span id="tableNo">TBA</span>, Seat <span id="seatNo">TBA</span>
             </div>
         </div>
     </div>
 </div>
 
-<div class="hint" id="tapPrompt">Click Seal to Enter</div>
+<div id="stage">
+    <div class="envelope-wrapper" id="envelopeWrapper" onclick="openInvitation()">
+        <div class="light-beam"></div>
+        <div class="flap" id="flap"></div>
+        <div class="wax-seal" id="waxSeal"></div>
+    </div>
+</div>
+
+<div class="tap-hint" id="tapHint">Tap to Open</div>
 
 <script>
-    // Seating logic
     const params = new URLSearchParams(window.location.search);
-    let table = params.get('table') || '';
-    let seat = params.get('seat') || '';
-    const sid = params.get('sid');
-    if (sid) {
-        const id = parseInt(sid);
-        table = Math.ceil(id / 10);
-        seat  = ((id - 1) % 10) + 1;
+    document.getElementById('tableNo').innerText = params.get('table') || 'TBA';
+    document.getElementById('seatNo').innerText  = params.get('seat')  || 'TBA';
+
+    /* Create Floating Cinematic Particles */
+    function createParticles() {
+        for(let i=0; i<30; i++) {
+            const p = document.createElement('div');
+            p.className = 'bokeh-particle';
+            const size = Math.random() * 10 + 5;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = Math.random() * 100 + 'vh';
+            document.body.appendChild(p);
+            
+            gsap.to(p, {
+                x: (Math.random() - 0.5) * 200,
+                y: (Math.random() - 0.5) * 200,
+                opacity: Math.random() * 0.5 + 0.1,
+                duration: Math.random() * 10 + 5,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        }
     }
-    document.getElementById('tableNo').innerText = table || 'TBA';
-    document.getElementById('seatNo').innerText  = seat  || 'TBA';
+    createParticles();
 
-    // Particle Generation
-    const pContainer = document.getElementById('particles');
-    for (let i = 0; i < 40; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 3 + 1;
-        p.style.width = p.style.height = `${size}px`;
-        pContainer.appendChild(p);
+    let isOpen = false;
+    function openInvitation() {
+        if (isOpen) return;
+        isOpen = true;
         
-        gsap.set(p, {
-            x: Math.random() * innerWidth,
-            y: Math.random() * innerHeight,
-            opacity: Math.random() * 0.5 + 0.1
-        });
-        
-        gsap.to(p, {
-            y: "-=100",
-            x: `+=${Math.random() * 40 - 20}`,
-            opacity: 0,
-            duration: Math.random() * 3 + 2,
-            repeat: -1,
-            delay: Math.random() * 5,
-            ease: "none"
-        });
-    }
+        const stage   = document.getElementById('stage');
+        const wrapper = document.getElementById('envelopeWrapper');
+        const flap    = document.getElementById('flap');
+        const seal    = document.getElementById('waxSeal');
+        const overlay = document.getElementById('cardOverlay');
+        const hint    = document.getElementById('tapHint');
 
-    let started = false;
-    function startCinematicReveal() {
-        if (started) return;
-        started = true;
+        /* 1. Camera Pushes In & Wax Seal Glows */
+        stage.classList.add('push-in');
+        seal.classList.add('glow');
+        gsap.to(hint, { opacity: 0, duration: 0.5 });
 
-        const flap = document.getElementById('masterFlap');
-        const card = document.getElementById('theCard');
-        const text = document.getElementById('cardText');
-        const glow = document.getElementById('sealGlow');
-        const light = document.getElementById('innerLight');
-        const prompt = document.getElementById('tapPrompt');
-        const stage = document.getElementById('stage');
+        /* 2. Envelope Lifts & Tilts */
+        setTimeout(() => wrapper.classList.add('lifted'), 600);
 
-        const tl = gsap.timeline();
+        /* 3. Flap Opens Gracefully */
+        setTimeout(() => {
+            wrapper.classList.add('opened');
+            flap.classList.add('open');
+        }, 1500);
 
-        // 1. Camera Pushes In / Envelope tilts forward
-        tl.to(stage, { scale: 1.1, duration: 1.2, ease: "power2.out" })
-          .to(".envelope-container", { rotateX: 15, y: -20, duration: 1, ease: "power1.inOut" }, "-=0.8")
-          .to(prompt, { opacity: 0, duration: 0.3 }, 0);
+        /* 4. Cinematic Fade & Card Float Up */
+        setTimeout(() => stage.classList.add('fade-back'), 3000);
+        setTimeout(() => overlay.classList.add('visible'), 3400);
 
-        // 2. Wax Seal glows and fades
-        tl.to(glow, { scale: 1.5, opacity: 0, duration: 0.6, ease: "power1.in" }, "-=0.4");
-
-        // 3. Flap opens cinematically
-        tl.to(flap, { rotateX: -170, duration: 1.8, ease: "power2.inOut" }, "-=0.2");
-
-        // 4. Reveal inner lighting
-        tl.to(light, { opacity: 1, duration: 1 }, "-=1.2");
-
-        // 5. Card rises smoothly (Floating up)
-        // We move the whole container a bit down as card goes up to simulate extraction
-        tl.to(card, { bottom: "10%", duration: 2.5, ease: "power2.inOut" }, "-=1");
-
-        // 6. Transition to final frame: Card becomes the focus
-        // The container expands the "window" to show the full card rising ABOVE the envelope
-        tl.to("#cardContainer", { overflow: "visible", duration: 0.1 });
-        tl.to(card, { scale: 1.2, y: -280, boxShadow: "0 30px 60px rgba(0,0,0,0.8)", duration: 1.8, ease: "power2.out" }, "-=1.2");
-        
-        // 7. Text fades onto card
-        tl.to(text, { opacity: 1, duration: 1.5, ease: "power1.out" }, "-=0.8");
-
-        // 8. Intense particles
-        tl.to(".particle", { opacity: 0.8, scale: 1.5, duration: 2, stagger: 0.05 }, "-=2");
+        /* 5. Golden Shimmer Confetti */
+        setTimeout(() => {
+            confetti({
+                particleCount: 200,
+                spread: 90,
+                origin: { y: 0.7 },
+                colors: ['#C8A84B', '#ffffff', '#043927'],
+                ticks: 300
+            });
+        }, 3600);
     }
 </script>
 </body>
