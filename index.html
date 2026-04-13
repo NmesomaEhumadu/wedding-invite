@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation | Honored Guest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Alex+Brush&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 60%, #000000 100%);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* =============================================
+           STAGE — envelope lives here, centered
+           ============================================= */
+        #stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        #stage.fade-back {
+            opacity: 0.25;
+            transform: scale(0.88) translateY(30px);
+            pointer-events: none;
+        }
+
+        /* =============================================
+           ENVELOPE WRAPPER
+           ============================================= */
+        .envelope-wrapper {
+            position: relative;
+            width: 540px;
+            height: 375px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .envelope-wrapper:hover:not(.opened) {
+            transform: translateY(-4px);
+        }
+
+        /* ── BASE SVG (always visible — body panels) ── */
+        .env-base-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            border-radius: 3px;
+            filter: drop-shadow(0 22px 45px rgba(0,0,0,0.4)) drop-shadow(0 6px 16px rgba(0,0,0,0.2));
+        }
+
+        /* ── FLAP ── */
+        .flap {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: visible;
+            transform-origin: top center;
+            transform-style: preserve-3d;
+            transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+        .flap.open {
+            transform: perspective(1600px) rotateX(-192deg);
+        }
+        .flap-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        /* ── WAX SEAL ── */
+        .wax-seal {
+            position: absolute;
+            top: 196px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 36% 32%,
+                #ffffff 0%, #f0f0f0 20%, #e0e0e0 52%, #d0d0d0 100%);
+            border: 1.5px solid rgba(255,255,255,.5);
+            box-shadow:
+                0 6px 24px rgba(0,0,0,.42),
+                inset 0 2px 6px rgba(255,255,255,.8),
+                inset 0 -3px 6px rgba(0,0,0,.15);
+            z-index: 20;
+            transition: transform 0.6s ease, opacity 0.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Playfair Display', serif;
+            font-weight: bold;
+            color: #555;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+        .wax-seal::after {
+            content: 'T&A';
+            opacity: 0.6;
+        }
+        .wax-seal.gone {
+            transform: translateX(-50%) scale(0);
+            opacity: 0;
+        }
+
+        /* =============================================
+           CARD OVERLAY — fixed, centered, starts hidden
+           Appears AFTER the flap fully opens
+           ============================================= */
+        #cardOverlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            pointer-events: none;
+            /* starts invisible */
+            opacity: 0;
+            transition: opacity 0.7s ease;
+        }
+        #cardOverlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .card {
+            background: #ffffff;
+            width: 480px;
+            max-width: 90vw;
+            border-radius: 3px;
+            box-shadow:
+                0 40px 100px rgba(0,0,0,0.5),
+                0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(4, 57, 39, 0.2);
+            position: relative;
+            transform: scale(0.88) translateY(20px);
+            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
+        }
+        #cardOverlay.visible .card {
+            transform: scale(1) translateY(0);
+        }
+
+        .card-body {
+            position: absolute;
+            inset: 14px;
+            border: 1px solid rgba(4, 57, 39, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px 26px;
+        }
+        .card-body::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 1px solid rgba(4, 57, 39, 0.1);
+            pointer-events: none;
+        }
+        /* card has aspect ratio for content */
+        .card::after {
+            content: '';
+            display: block;
+            padding-top: 120%; /* tall card */
+        }
+
+        /* Card text */
+        .card-label  { font-size: 9px; letter-spacing: .32em; text-transform: uppercase; color: #666; margin-bottom: 10px; }
+        .card-script { font-family: 'Alex Brush', cursive; color: #043927; font-size: 3.5rem; line-height: 1.1; }
+        .orn         { display: flex; align-items: center; gap: 10px; margin: 14px auto; max-width: 280px; width: 100%; }
+        .orn-line    { flex: 1; height: 1px; }
+        .orn-l       { background: linear-gradient(to right, transparent, #043927); }
+        .orn-r       { background: linear-gradient(to left,  transparent, #043927); }
+        .orn-icon    { color: #043927; font-size: .9rem; flex-shrink: 0; }
+        .greeting    { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: #111; margin-bottom: 3px; }
+        .gname       { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-style: italic; color: #043927; margin-bottom: 14px; }
+        .footer-text { font-size: 8px; letter-spacing: .46em; text-transform: uppercase; color: #999; }
+
+        /* SEATING REVEAL STYLING */
+        .seating-reveal {
+            margin: 20px 0;
+            width: 100%;
+        }
+        .seat-title {
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .seat-numbers {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .seat-box {
+            background: linear-gradient(135deg, #043927, #022016);
+            padding: 15px 25px;
+            border-radius: 12px;
+            min-width: 110px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .box-label {
+            display: block;
+            font-size: 8px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+        .box-value {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .seat-sep {
+            width: 1px;
+            height: 40px;
+            background: rgba(4, 57, 39, 0.2);
+        }
+
+        /* Close button */
+        .card-close {
+            position: absolute;
+            top: 14px; right: 14px;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #111;
+            font-size: 16px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            z-index: 5;
+        }
+        .card-close:hover { background: rgba(0,0,0,0.1); }
+
+        /* TAP HINT */
+        .tap-hint {
+            position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
+            font-size: 9px; letter-spacing: .44em; text-transform: uppercase;
+            color: #eee; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px;
+            pointer-events: none;
+            animation: ph 2.2s ease-in-out infinite;
+        }
+        @keyframes ph { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+        .sparkle {
+            position: fixed; border-radius: 50%;
+            background: #ffffff; pointer-events: none; z-index: 300; opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- =============================================
+     CARD OVERLAY (hidden until envelope opens)
+     ============================================= -->
+<div id="cardOverlay">
+    <div class="card">
+        <div class="card-close" onclick="closeCard()">✕</div>
+        <div class="card-body">
+            <p class="card-label">Welcome to our Celebration</p>
+            <h2 class="card-script">Guest Seating</h2>
+            <div class="orn">
+                <div class="orn-line orn-l"></div>
+                <span class="orn-icon">✦</span>
+                <div class="orn-line orn-r"></div>
+            </div>
+            
+            <div class="seating-reveal">
+                <div class="seat-title">Your Reserved Space</div>
+                <div class="seat-numbers">
+                    <div class="seat-box">
+                        <span class="box-label">Table</span>
+                        <span class="box-value" id="tableNo">TBA</span>
+                    </div>
+                    <div class="seat-sep"></div>
+                    <div class="seat-box">
+                        <span class="box-label">Seat</span>
+                        <span class="box-value" id="seatNo">TBA</span>
+                    </div>
+                </div>
+            </div>
+
+            <p class="invite-text">It is a pleasure to have you join us on this special day. Please proceed to your assigned table to celebrate with us.</p>
+            
+            <div class="orn">
+                <div class="orn-line orn-l"></div>
+                <span class="orn-icon">✦</span>
+                <div class="orn-line orn-r"></div>
+            </div>
+            <p class="footer-text">Wedding Celebration &nbsp;•&nbsp; 2026</p>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     ENVELOPE STAGE
+     ============================================= -->
+<div id="stage">
+<div class="envelope-wrapper" id="envelopeWrapper" onclick="openInvitation()">
+
+    <!-- ── ENVELOPE BODY (back panels, always visible) ── -->
+    <svg class="env-base-svg" viewBox="0 0 540 375" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <filter id="fs" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0.8" dy="1.5" stdDeviation="1.3"
+                    flood-color="#000" flood-opacity="0.3"/>
+            </filter>
+        </defs>
+
+        <!-- Rounded base rect -->
+        <rect x="0" y="0" width="540" height="375" rx="3" fill="#043927"/>
+
+        <!-- Side triangles (darker) -->
+        <polygon points="0,0 270,230 0,375"   fill="#022a1d"/>
+        <polygon points="540,0 270,230 540,375" fill="#022a1d"/>
+        <!-- Bottom triangle (lighter) -->
+        <polygon points="0,375 270,230 540,375" fill="#054d35"/>
+
+        <!-- Crease lines -->
+        <line x1="0"   y1="0"   x2="270" y2="230" stroke="#ffffff" stroke-width="0.7" opacity="0.1"/>
+        <line x1="540" y1="0"   x2="270" y2="230" stroke="#ffffff" stroke-width="0.7" opacity="0.1"/>
+        <line x1="0"   y1="375" x2="270" y2="230" stroke="#ffffff" stroke-width="0.7" opacity="0.1"/>
+        <line x1="540" y1="375" x2="270" y2="230" stroke="#ffffff" stroke-width="0.7" opacity="0.1"/>
+
+        <!-- ══ BOTTOM-LEFT CORNER FILIGREE ══ -->
+        <g filter="url(#fs)">
+            <path d="M 14 362 C 14 338 26 318 48 304 C 64 294 82 286 92 270"
+                  stroke="#ffffff" stroke-width="2.3" fill="none" stroke-linecap="round" opacity="0.8"/>
+            <path d="M 14 362 C 34 356 52 340 60 322 C 68 304 64 286 78 272"
+                  stroke="#ffffff" stroke-width="1.7" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M 60 320 C 70 308 84 312 80 324 C 76 334 64 332 60 322"
+                  stroke="#ffffff" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <path d="M 40 342 C 50 330 64 336 60 348 C 56 358 44 354 40 344"
+                  stroke="#ffffff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.4"/>
+            <circle cx="14" cy="362" r="5"   fill="#ffffff" opacity="0.9"/>
+            <circle cx="60" cy="322" r="2.3" fill="#ffffff" opacity="0.7"/>
+        </g>
+
+        <!-- ══ BOTTOM-RIGHT CORNER FILIGREE (mirror) ══ -->
+        <g filter="url(#fs)" transform="translate(540,0) scale(-1,1)">
+            <path d="M 14 362 C 14 338 26 318 48 304 C 64 294 82 286 92 270"
+                  stroke="#ffffff" stroke-width="2.3" fill="none" stroke-linecap="round" opacity="0.8"/>
+            <path d="M 14 362 C 34 356 52 340 60 322 C 68 304 64 286 78 272"
+                  stroke="#ffffff" stroke-width="1.7" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M 60 320 C 70 308 84 312 80 324 C 76 334 64 332 60 322"
+                  stroke="#ffffff" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <path d="M 40 342 C 50 330 64 336 60 348 C 56 358 44 354 40 344"
+                  stroke="#ffffff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.4"/>
+            <circle cx="14" cy="362" r="5"   fill="#ffffff" opacity="0.9"/>
+            <circle cx="60" cy="322" r="2.3" fill="#ffffff" opacity="0.7"/>
+        </g>
+    </svg>
+
+    <!-- ── FLAP (top triangle, rotates open) ── -->
+    <div class="flap" id="flap">
+        <svg class="flap-svg" viewBox="0 0 540 375" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="ff" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0.8" dy="1.5" stdDeviation="1.3"
+                        flood-color="#000" flood-opacity="0.3"/>
+                </filter>
+                <linearGradient id="flapG" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stop-color="#055a40"/>
+                    <stop offset="50%"  stop-color="#043927"/>
+                    <stop offset="100%" stop-color="#022a1d"/>
+                </linearGradient>
+            </defs>
+
+            <!-- Flap triangle -->
+            <polygon points="0,0 540,0 270,230" fill="url(#flapG)"
+                     filter="drop-shadow(0 8px 14px rgba(0,0,0,0.3))"/>
+
+            <!-- ══ TOP-LEFT FLAP FILIGREE ══ -->
+            <g filter="url(#ff)">
+                <path d="M 14 14 C 36 14 68 24 90 50 C 108 72 106 106 94 128"
+                      stroke="#ffffff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.8"/>
+                <path d="M 14 14 C 16 42 28 68 52 84 C 68 96 86 102 88 126"
+                      stroke="#ffffff" stroke-width="1.7" fill="none" stroke-linecap="round" opacity="0.6"/>
+                <circle cx="14"  cy="14"  r="5.5" fill="#ffffff" opacity="0.9"/>
+                <circle cx="67"  cy="36"  r="2.4" fill="#ffffff" opacity="0.7"/>
+                <circle cx="90"  cy="70"  r="2.2" fill="#ffffff" opacity="0.6"/>
+            </g>
+
+            <!-- ══ TOP-RIGHT FLAP FILIGREE (mirror) ══ -->
+            <g filter="url(#ff)" transform="translate(540,0) scale(-1,1)">
+                <path d="M 14 14 C 36 14 68 24 90 50 C 108 72 106 106 94 128"
+                      stroke="#ffffff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.8"/>
+                <path d="M 14 14 C 16 42 28 68 52 84 C 68 96 86 102 88 126"
+                      stroke="#ffffff" stroke-width="1.7" fill="none" stroke-linecap="round" opacity="0.6"/>
+                <circle cx="14"  cy="14"  r="5.5" fill="#ffffff" opacity="0.9"/>
+                <circle cx="67"  cy="36"  r="2.4" fill="#ffffff" opacity="0.7"/>
+                <circle cx="90"  cy="70"  r="2.2" fill="#ffffff" opacity="0.6"/>
+            </g>
+        </svg>
+    </div><!-- /flap -->
+
+    <!-- WAX SEAL -->
+    <div class="wax-seal" id="waxSeal"></div>
+
+</div><!-- /envelope-wrapper -->
+</div><!-- /stage -->
+
+<div class="tap-hint" id="tapHint">Tap to Open</div>
+
+<script>
+    /* URL personalisation */
+    const params = new URLSearchParams(window.location.search);
+    let table  = params.get('table') || '';
+    let seat   = params.get('seat')  || '';
+    const sid  = params.get('sid'); // Sequential ID (1-260)
+
+    /* Automatic calculation if sid is provided */
+    if (sid && !table && !seat) {
+        const idNum = parseInt(sid);
+        if (!isNaN(idNum) && idNum > 0) {
+            table = Math.ceil(idNum / 10);
+            seat  = ((idNum - 1) % 10) + 1;
+        }
+    }
+
+    /* Fallbacks */
+    if (!table) table = 'TBA';
+    if (!seat)  seat  = 'TBA';
+
+    document.getElementById('tableNo').innerText = table;
+    document.getElementById('seatNo').innerText  = seat;
+
+    let isOpen = false;
+
+    function openInvitation() {
+        if (isOpen) return;
+        isOpen = true;
+        document.getElementById('envelopeWrapper').classList.add('opened');
+
+        const flap    = document.getElementById('flap');
+        const seal    = document.getElementById('waxSeal');
+        const stage   = document.getElementById('stage');
+        const overlay = document.getElementById('cardOverlay');
+        const hint    = document.getElementById('tapHint');
+
+        /* 1. Seal disappears */
+        seal.classList.add('gone');
+
+        /* 2. Flap opens (slight delay for better drama) */
+        setTimeout(() => flap.classList.add('open'), 150);
+
+        /* 3. Hint fades */
+        gsap.to(hint, { opacity: 0, y: 8, duration: 0.4 });
+
+        /* 4. Envelope fades back */
+        setTimeout(() => stage.classList.add('fade-back'), 800);
+
+        /* 5. Card overlay appears centered */
+        setTimeout(() => overlay.classList.add('visible'), 1000);
+
+        /* 6. Confetti */
+        setTimeout(() => {
+            const cfg = { origin: { y: 0.55 }, colors: ['#043927','#ffffff','#022a1d','#d4d4d4'] };
+            const fire = (r, o) => confetti({ ...cfg, ...o, particleCount: Math.floor(140 * r) });
+            fire(0.25, { spread: 28, startVelocity: 55 });
+            fire(0.20, { spread: 65 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.10, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.10, { spread: 120, startVelocity: 45 });
+        }, 1300);
+
+        /* 7. Emerald sparkles */
+        for (let i = 0; i < 20; i++) {
+            const s = document.createElement('div');
+            s.className = 'sparkle';
+            document.body.appendChild(s);
+            const sz = Math.random() * 5 + 2;
+            gsap.set(s, { x: Math.random() * innerWidth, y: Math.random() * innerHeight, width: sz, height: sz, opacity: 0 });
+            gsap.to(s, { opacity: 0.7, duration: Math.random() * 1.2 + 0.5, repeat: -1, yoyo: true, delay: Math.random() * 2.5 });
+        }
+    }
+
+    function closeCard() {
+        const overlay = document.getElementById('cardOverlay');
+        const stage   = document.getElementById('stage');
+        overlay.classList.remove('visible');
+        setTimeout(() => stage.classList.remove('fade-back'), 400);
+    }
+</script>
+</body>
+</html>
