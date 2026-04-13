@@ -26,13 +26,8 @@
             overflow: hidden;
         }
 
-        /* Desktop Optimization */
         @media (min-width: 1024px) {
-            body {
-                background-size: contain; 
-                background-repeat: no-repeat;
-                background-position: center;
-            }
+            body { background-size: contain; background-repeat: no-repeat; background-position: center; }
         }
 
         body::after {
@@ -68,14 +63,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        @media (min-width: 1024px) {
-            .envelope-wrapper { width: 320px; height: 450px; }
-        }
-
-        @media (max-width: 360px) {
-            .envelope-wrapper { transform: scale(0.85); }
         }
 
         .wax-seal {
@@ -123,64 +110,57 @@
             background: #ffffff;
             width: 440px;
             max-width: 100%;
-            max-height: 90vh;
-            border-radius: 4px;
+            max-height: 92vh;
+            border-radius: 6px;
             box-shadow: 0 60px 140px rgba(0,0,0,1);
-            border: 1px solid rgba(4, 57, 39, 0.2);
             position: relative;
             transform: scale(0.85) translateY(60px);
             transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            border: 1px solid rgba(4, 57, 39, 0.2);
         }
         #cardOverlay.visible .card { transform: scale(1) translateY(0); }
 
-        /* Exquisite Floral Border Decoration */
-        .floral-corner {
+        /* INTRICATE FLORAL SVG CORNERS */
+        .floral-svg {
             position: absolute;
-            width: 100px; height: 100px;
+            width: 130px;
+            height: 130px;
             pointer-events: none;
-            opacity: 0.15;
             z-index: 5;
-            background-image: url('final_bg.png');
-            background-size: 300%;
-            filter: grayscale(1) sepia(1) hue-rotate(90deg) brightness(0.6);
+            opacity: 0.9;
         }
-        .tl { top: 0; left: 0; border-radius: 0 0 100% 0; }
-        .br { bottom: 0; right: 0; border-radius: 100% 0 0 0; transform: rotate(180deg); }
+        .floral-tl { top: -10px; left: -10px; }
+        .floral-br { bottom: -10px; right: -10px; transform: rotate(180deg); }
 
         .card-body {
             position: relative;
-            flex: 1;
-            margin: 14px;
-            border: 1.5px solid rgba(4, 57, 39, 0.12);
+            margin: 15px;
+            border: 1.5px solid rgba(4, 57, 39, 0.1);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 50px 25px;
+            padding: 60px 25px;
             z-index: 10;
         }
-        .card::after { content: ''; display: block; padding-top: 145%; }
+        .card::after { content: ''; display: block; padding-top: 140%; }
 
-        /* Typography Enhancements */
         .reveal-item { opacity: 0; transform: translateY(15px); }
 
         .card-script { 
             font-family: 'Alex Brush', cursive; 
             color: #043927; 
-            font-size: 5.2rem; 
-            line-height: 1; 
+            font-size: 5rem; 
+            line-height: 1.2; 
             margin-bottom: 25px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .card-text { 
             font-size: 11px; 
             letter-spacing: 0.18em; 
-            color: #222; 
+            color: #333; 
             line-height: 1.8; 
             font-weight: 600; 
             text-transform: uppercase; 
@@ -189,67 +169,37 @@
         }
 
         .line-divider { 
-            width: 60px; height: 2px; 
+            width: 70px; height: 2px; 
             background: linear-gradient(to right, transparent, #C8A84B, transparent); 
             margin-bottom: 40px; 
         }
         
-        .badge-label { 
-            font-size: 9px; 
-            letter-spacing: 0.3em; 
-            text-transform: uppercase; 
-            color: #777; 
-            margin-bottom: 15px;
-            font-weight: 400;
-        }
+        .badge-label { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: #888; margin-bottom: 15px; }
 
         .seat-badge { 
             font-family: 'Playfair Display', serif; 
-            font-size: 2.1rem; 
+            font-size: 2rem; 
             font-weight: 700; 
             color: #C8A84B; 
             letter-spacing: 0.08em; 
             background: #043927;
-            padding: 18px 40px;
+            padding: 18px 35px;
             border-radius: 4px;
             box-shadow: 0 15px 40px rgba(4, 57, 39, 0.4);
-            border: 1px solid rgba(200, 168, 75, 0.3);
+            border: 1px solid rgba(200, 168, 75, 0.25);
         }
 
         @media (max-width: 480px) {
-            .card-script { font-size: 4rem; }
-            .card-text { font-size: 10px; line-height: 1.6; }
-            .seat-badge { font-size: 1.7rem; padding: 15px 30px; }
-            .card-body { padding: 35px 15px; }
+            .card-script { font-size: 3.8rem; }
+            .card-text { font-size: 10px; }
+            .seat-badge { font-size: 1.6rem; padding: 15px 25px; }
+            .floral-svg { width: 100px; height: 100px; }
         }
 
-        .footer-text { 
-            font-size: 8px; 
-            letter-spacing: .5em; 
-            text-transform: uppercase; 
-            color: #aaa; 
-            margin-top: 50px; 
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding-top: 25px;
-            width: 80%;
-        }
+        .footer-text { font-size: 8px; letter-spacing: .5em; text-transform: uppercase; color: #ccc; margin-top: 50px; }
 
-        .card-close { 
-            position: absolute; top: 15px; right: 15px; 
-            width: 30px; height: 30px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 18px; color: #999; cursor: pointer; z-index: 100;
-            background: rgba(0,0,0,0.03); border-radius: 50%;
-        }
-
-        .tap-hint {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            font-size: 9px; letter-spacing: 0.5em; text-transform: uppercase;
-            color: #fff; opacity: 0.8; pointer-events: none;
-            z-index: 20;
-        }
-
-        .sparkle { position: fixed; border-radius: 50%; background: #ffffff; pointer-events: none; z-index: 300; opacity: 0; }
+        .card-close { position: absolute; top: 15px; right: 15px; font-size: 18px; color: #ccc; cursor: pointer; z-index: 100; }
+        .tap-hint { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 9px; letter-spacing: 0.5em; text-transform: uppercase; color: #fff; z-index: 20; }
     </style>
 </head>
 <body>
@@ -257,23 +207,39 @@
 <div id="cardOverlay">
     <div class="card">
         <div class="card-close" onclick="closeCard()">✕</div>
-        <div class="floral-corner tl"></div>
-        <div class="floral-corner br"></div>
-        
+
+        <!-- INTRICATE FLORAL CORNER SVG 1 -->
+        <svg class="floral-svg floral-tl" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 20C40 60 100 80 140 40M40 100C60 140 120 160 160 120M20 20C60 40 80 100 40 140" stroke="#043927" stroke-width="2" opacity="0.6"/>
+            <circle cx="30" cy="30" r="15" fill="#043927" opacity="0.4"/>
+            <circle cx="130" cy="50" r="8" fill="#C8A84B" opacity="0.3"/>
+            <path d="M10 10 Q 50 10, 50 50" stroke="#C8A84B" stroke-width="1.5" opacity="0.5"/>
+            <path d="M20 60 C 40 40, 80 40, 100 60" stroke="#043927" stroke-width="1" opacity="0.4"/>
+            <!-- Add organic rose-like swirls -->
+            <path d="M40 40 C 60 20, 90 20, 110 40 C 130 60, 130 90, 110 110" stroke="#043927" stroke-width="1"/>
+            <path d="M30 30 C 15 45, 15 75, 30 90" stroke="#C8A84B" stroke-width="1"/>
+        </svg>
+
+        <!-- INTRICATE FLORAL CORNER SVG 2 -->
+        <svg class="floral-svg floral-br" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 20C40 60 100 80 140 40M40 100C60 140 120 160 160 120M20 20C60 40 80 100 40 140" stroke="#043927" stroke-width="2" opacity="0.6"/>
+            <circle cx="30" cy="30" r="15" fill="#043927" opacity="0.4"/>
+            <circle cx="130" cy="50" r="8" fill="#C8A84B" opacity="0.3"/>
+            <path d="M10 10 Q 50 10, 50 50" stroke="#C8A84B" stroke-width="1.5" opacity="0.5"/>
+            <!-- Rose swirl -->
+            <path d="M40 40 C 60 20, 90 20, 110 40 C 130 60, 130 90, 110 110" stroke="#043927" stroke-width="1"/>
+        </svg>
+
         <div class="card-body">
             <h1 class="card-script reveal-item">Welcome</h1>
-            
             <p class="card-text reveal-item">We're honored to have you celebrate this special day with us.</p>
-            
             <div class="line-divider reveal-item"></div>
-            
             <div class="reveal-item">
                 <p class="badge-label">Your Assigned Seat</p>
                 <div class="seat-badge">
                     Table <span id="tableNo">TBA</span>, Seat <span id="seatNo">TBA</span>
                 </div>
             </div>
-
             <p class="footer-text reveal-item">Wedding Celebration &nbsp;•&nbsp; 2026</p>
         </div>
     </div>
@@ -293,7 +259,6 @@
     let table = params.get('table') || '';
     let seat = params.get('seat') || '';
     const sid = params.get('sid');
-
     if (sid && !table && !seat) {
         const idNum = parseInt(sid);
         if (!isNaN(idNum) && idNum > 0) {
@@ -301,7 +266,6 @@
             seat  = ((idNum - 1) % 10) + 1;
         }
     }
-
     document.getElementById('tableNo').innerText = table || 'TBA';
     document.getElementById('seatNo').innerText  = seat  || 'TBA';
 
@@ -309,52 +273,23 @@
     function openInvitation() {
         if (isOpen) return;
         isOpen = true;
-        
         const wrapper = document.getElementById('envelopeWrapper');
         const flap    = document.getElementById('flap');
-        const seal    = document.getElementById('waxSeal');
         const stage   = document.getElementById('stage');
         const overlay = document.getElementById('cardOverlay');
         const hint    = document.getElementById('tapHint');
-
         wrapper.classList.add('opened');
         flap.classList.add('open');
         gsap.to(hint, { opacity: 0, duration: 0.3 });
-
         setTimeout(() => stage.classList.add('fade-back'), 800);
         setTimeout(() => {
             overlay.classList.add('visible');
-            /* Staggered text reveal */
-            gsap.to(".reveal-item", {
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                stagger: 0.25,
-                ease: "power2.out",
-                delay: 0.4
-            });
+            gsap.to(".reveal-item", { opacity: 1, y: 0, duration: 1.2, stagger: 0.3, ease: "power2.out", delay: 0.4 });
         }, 1100);
-
         setTimeout(() => {
-            confetti({
-                particleCount: 180,
-                spread: 80,
-                origin: { y: 0.6 },
-                colors: ['#043927', '#C8A84B', '#ffffff']
-            });
+            confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 }, colors: ['#043927', '#C8A84B', '#ffffff'] });
         }, 1500);
-
-        /* Extra sparkles */
-        for (let i = 0; i < 25; i++) {
-            const s = document.createElement('div');
-            s.className = 'sparkle';
-            document.body.appendChild(s);
-            const size = Math.random() * 4 + 2;
-            gsap.set(s, { x: Math.random() * innerWidth, y: Math.random() * innerHeight, width: size, height: size });
-            gsap.to(s, { opacity: 0.8, duration: 1, repeat: -1, yoyo: true, delay: Math.random() * 2 });
-        }
     }
-
     function closeCard() {
         document.getElementById('cardOverlay').classList.remove('visible');
         setTimeout(() => {
