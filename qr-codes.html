@@ -57,11 +57,29 @@
             color: #043927;
             text-align: center;
             margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+        }
+        .table-header span {
             border-bottom: 2px solid #043927;
-            display: block;
-            width: fit-content;
             padding-bottom: 5px;
         }
+        .btn-small {
+            background: #043927;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .btn-small:hover { opacity: 0.9; }
 
         .table-grid {
             display: grid;
@@ -128,10 +146,34 @@
         .btn:hover { background: #032b1d; }
 
         @media print {
-            .controls, .nav { display: none; }
-            body { padding: 0; background: #fff; }
-            .table-section { margin-bottom: 40px; }
-            .qr-card { box-shadow: none; border: 1px solid #ddd; padding: 15px; }
+            .controls, .nav, .btn-small { display: none !important; }
+            body { padding: 0 !important; background: #fff !important; }
+            .table-section { margin-bottom: 0 !important; }
+            
+            /* If printing a specific table */
+            body.print-single .table-section { display: none !important; }
+            body.print-single .table-section.active-print { display: block !important; }
+            
+            .table-header { margin-top: 0 !important; border: none !important; margin-bottom: 40px !important; }
+            .table-header span { border: none !important; font-size: 1.2rem !important; }
+
+            .table-grid { display: block !important; }
+            .qr-card { 
+                box-shadow: none !important; 
+                border: none !important; 
+                padding: 0 !important; 
+                page-break-after: always !important;
+                height: 100vh !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            .qr-card img { 
+                width: 80% !important; 
+                max-width: 400px !important; 
+            }
+            .numbers { font-size: 1.5rem !important; margin-top: 20px !important; }
         }
     </style>
 </head>
@@ -175,7 +217,13 @@
             const section = document.createElement('div');
             section.className = 'table-section';
             section.id = `table-${t}`;
-            section.innerHTML = `<div class="table-header">Table ${t}</div><div class="table-grid" id="grid-${t}"></div>`;
+            section.innerHTML = `
+                <div class="table-header">
+                    <span>Table ${t}</span>
+                    <button class="btn-small" onclick="printTable(${t})">Download PDF</button>
+                </div>
+                <div class="table-grid" id="grid-${t}"></div>
+            `;
             container.appendChild(section);
 
             const grid = document.getElementById(`grid-${t}`);
@@ -194,6 +242,21 @@
                 `;
                 grid.appendChild(card);
             }
+        }
+
+        function printTable(t) {
+            const section = document.getElementById(`table-${t}`);
+            document.body.classList.add('print-single');
+            section.classList.add('active-print');
+            
+            // Trigger print
+            window.print();
+            
+            // Cleanup after a delay (dialog closes)
+            setTimeout(() => {
+                document.body.classList.remove('print-single');
+                section.classList.remove('active-print');
+            }, 1000);
         }
     </script>
 </body>
